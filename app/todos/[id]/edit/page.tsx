@@ -4,27 +4,39 @@ import { useTodos } from '@/app/context/TodoContext';
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation';
 
-import React, { Suspense, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
-function Page() {
+export default function EditTodoPage() {
   const router = useRouter();
-  const { updateTodo, getTodo } = useTodos();
-  const params = useParams()
-  const id = params.id as string
+  const params = useParams();
+
+  const { getTodo, updateTodo } = useTodos();
+  const id = params.id as string;
+
   const todo = getTodo(id)
-  const [title, setTitle] = useState(todo!.title);
-  const [description, setDescription] = useState(todo!.description);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+
+  //기존 데이터로 폼 초기화
+  useEffect(() => {
+    if (todo) {
+      setTitle(todo.title)
+      setDescription(todo.description)
+    }
+  }, [todo])
+
 
   // React.FormEvent  ==> React.SubmitEvent<HTMLFormElement>
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    updateTodo(id, title, description);
-    router.push('/')//저장 후 전체보기 페이지로 이동
+    if (!title.trim()) return;
+    updateTodo(id, title, description)
+    router.push(`/todos/${id}`)//저장 후 전체보기 페이지로 이동
   }
   return (
     <div>
       <header className='mb-6 pb-4 border-b'>
-        <h1 className='text-2xl font-bold'>새 할 일 추가</h1>
+        <h1 className='text-2xl font-bold'>할 일 수정</h1>
       </header>
 
       <form onSubmit={handleSubmit} className='space-y-4'>
@@ -32,7 +44,6 @@ function Page() {
           <label className='block text-sm font-medium mb-1'>제목 *</label>
           <input type='text' required
             value={title}
-            placeholder='할 일 제목 입력'
             onChange={(e) => setTitle(e.target.value)}
             className='w-full border rounded-lg px-3 py-2
                    focus:outline-none  focus:border-blue-500' />
@@ -43,7 +54,6 @@ function Page() {
           <textarea rows={4}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder='세부내용 입력(선택)'
             className='w-full border rounded-lg px-3 py-2 
                             focus:outline-none  focus:border-blue-500'  />
 
@@ -57,7 +67,7 @@ function Page() {
           <button type='submit'
             className='px-4 py-2 bg-blue-500 text-white rounded-lg
            hover:bg-blue-600'>
-            저장하기
+            수정완료
           </button>
 
         </div>
@@ -66,14 +76,5 @@ function Page() {
 
 
     </div>
-  )
-}
-
-
-export default function UpdateTodoPage() {
-  return (
-    <Suspense fallback={<div className='text-center py-10 text-gray-500'>불러오는 중...</div>}>
-      <Page />
-    </Suspense>
   )
 }

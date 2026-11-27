@@ -25,6 +25,7 @@ function TodoDetailContent() {
   const handleDelete = () => {
     deleteTodo(todo.id)
     router.push('/');// 삭제 후 목록으로 이동
+    
   }
 
   return (
