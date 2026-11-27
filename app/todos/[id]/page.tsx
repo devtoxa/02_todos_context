@@ -4,12 +4,12 @@
 import { useTodos } from '@/app/context/TodoContext'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import React from 'react'
+import React, { Suspense } from 'react'
 
-export default function TodoDetailPage() {
+function TodoDetailContent() {
     const params = useParams();
     const router = useRouter();
-    const { getTodo, deleteTodo, toggleTodo } = useTodos();
+    const { getTodo, toggleTodo, deleteTodo } = useTodos();
 
     const id = params.id as string
     const todo = getTodo(id)
@@ -30,7 +30,6 @@ export default function TodoDetailPage() {
     return (
         <div>
             <header className='flex justify-between items-center mb-6 pb-4 border-b'>
-                <button onClick={() => toggleTodo(todo.id)}></button>
                 <Link href="/"
                     className='text-sm text-gray-500 hover:text-gray-800'>목록으로</Link>
                 <span className='text-xs text-gray-400'>작성일 :{todo?.createAt}</span>
@@ -44,7 +43,7 @@ export default function TodoDetailPage() {
                     <h1 className='text-2xl font-bold'> {todo?.title} </h1>
                 </div>
 
-                <div className='bg-gray-50 p-4 rouned-lg min-h-[120-px] 
+                <div className='bg-gray-50 p-4 rounded-lg min-h-[120-px] 
             whitespace-pre-wrap text-gray-700'>
                     {todo?.description || '작성된 상세 내용이 없습니다.'}
                 </div>
@@ -52,6 +51,7 @@ export default function TodoDetailPage() {
 
             <div className='flex justify-between pt-4 border-t'>
                 <button
+                    onClick={() => toggleTodo(todo.id)}
                     className='px-4 py-2 border border-blue-500 text-blue-500  rounded-lg
            hover:bg-blue-600'>
                     {todo?.completed ? "진행 중으로 변경" : "완료로 표시"}</button>
@@ -69,4 +69,12 @@ export default function TodoDetailPage() {
             </div>
         </div>
     )
+}
+
+export default function TodoDetailPage() {
+    return (
+        <Suspense fallback={<div className='text-center py-10 text-gray-500'>불러오는 중...</div>}>
+            <TodoDetailContent />
+        </Suspense>
+    );
 }
