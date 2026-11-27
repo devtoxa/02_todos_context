@@ -58,8 +58,10 @@ export function TodoProvider({children} : {children:ReactNode}){
                 : todo))
   }
 
-  const deleteTodo = () =>{
-
+  //삭제
+  const deleteTodo = (id:string) =>{
+    setTodos((prev)=>
+        prev.filter((todo)=>todo.id !== id))
   }
 
   const getTodo =(id:string) =>  todos.find((todo)=>todo.id === id)
